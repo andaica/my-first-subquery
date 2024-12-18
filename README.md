@@ -1,8 +1,8 @@
-# SubQuery - Example Project for BNB Smart Chain
+# SubQuery - Example Project for NFT2 Protocol
 
 [SubQuery](https://subquery.network) is a fast, flexible, and reliable open-source data indexer that provides you with custom APIs for your web3 project across all of our supported networks. To learn about how to get started with SubQuery, [visit our docs](https://academy.subquery.network).
 
-**This SubQuery project indexes all transfers and approval events for the [Binance Peg Ethereum token](https://bscscan.com/address/0x2170ed0880ac9a755fd29b2688956bd959f933f8) on BNB Smart Chain**
+**This SubQuery project indexes all Collections and NFTs of NFT2 protocol**
 
 ## Start
 
@@ -10,7 +10,7 @@ First, install SubQuery CLI globally on your terminal by using NPM `npm install 
 
 You can either clone this GitHub repo, or use the `subql` CLI to bootstrap a clean project in the network of your choosing by running `subql init` and following the prompts.
 
-Don't forget to install dependencies with `npm install` or `yarn install`!
+Don't forget to install dependencies with `yarn install`!
 
 ## Editing your SubQuery project
 
@@ -41,26 +41,17 @@ For this project, you can try to query with the following GraphQL code to get a 
 ```graphql
 {
   query {
-    transfers(first: 5, orderBy: VALUE_DESC) {
+    collections(first: 5, orderBy: BLOCK_HEIGHT_ASC) {
       totalCount
       nodes {
-        id
-        blockHeight
-        from
-        to
-        value
-        contractAddress
+        blockHeight, id, address, chainId, owner
       }
     }
-  }
-  approvals(first: 5, orderBy: BLOCK_HEIGHT_DESC) {
-    nodes {
-      id
-      blockHeight
-      owner
-      spender
-      value
-      contractAddress
+    nFTs(first:10, orderBy: BLOCK_HEIGHT_ASC) {
+      totalCount
+      nodes {
+        collection, tokenId, tokenUri, owner
+      }
     }
   }
 }
