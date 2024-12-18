@@ -1,32 +1,32 @@
-import { NFT } from "../types";
 import { TransferLog } from "../types/abi-interfaces/Erc721Abi";
 import assert from "assert";
+import { ADDRESS_ZERO, CHAIN_LIST, getNFT } from "./utils";
 
-export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-
-export async function getNFT(
-  collection: string,
-  tokenId: bigint
-): Promise<NFT> {
-  let nft = await NFT.get(`${collection.toLowerCase()}-${tokenId.toString()}`);
-
-  if (!nft) {
-    nft = NFT.create({
-      id: `${collection.toLowerCase()}-${tokenId.toString()}`,
-      collection: collection.toLowerCase(),
-      tokenId: BigInt(tokenId),
-    });
-    // await nft.save();
-  }
-
-  return nft;
+export async function handleTransferAvaxTestnet(log: TransferLog) {
+  await handleTransferForChain(CHAIN_LIST.AVAX_TESTNET, log);
 }
 
-export async function handleTransfer(log: TransferLog): Promise<void> {
+export async function handleTransferBnbTestnet(log: TransferLog) {
+  await handleTransferForChain(CHAIN_LIST.BNB_TESTNET, log);
+}
+
+export async function handleTransferDERATestnet(log: TransferLog) {
+  await handleTransferForChain(CHAIN_LIST.DERA_TESTNET, log);
+}
+
+export async function handleTransferForChain(
+  chainId: number,
+  log: TransferLog
+): Promise<void> {
   logger.info(`New Transfer log at block ${log.blockNumber}`);
   assert(log.args, "No log.args");
 
-  const nft = await getNFT(log.address, log.args.tokenId.toBigInt());
+  const nft = await getNFT(
+    chainId,
+    log.address,
+    log.args.tokenId.toBigInt(),
+    true
+  );
   nft.owner = log.args.to.toLowerCase();
 
   if (log.args.from == ADDRESS_ZERO) {
@@ -34,6 +34,7 @@ export async function handleTransfer(log: TransferLog): Promise<void> {
       `NFT ${log.args.tokenId} is minted on collection ${log.address}`
     );
     nft.blockHeight = BigInt(log.blockNumber);
+    nft.timestamp = BigInt(log.block.timestamp);
   } else if (log.args.to == ADDRESS_ZERO) {
     logger.info(
       `NFT ${log.args.tokenId} is burned from collection ${log.address}`
@@ -44,5 +45,6 @@ export async function handleTransfer(log: TransferLog): Promise<void> {
   logger.info(
     `NFT ${log.args.tokenId} is transfered on collection ${log.address}`
   );
+
   return await nft.save();
 }

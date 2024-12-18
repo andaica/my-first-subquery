@@ -1,2 +1,2 @@
-export * from "./mappings/FactoryAbiHandlers";
+export * from "./mappings/factoryHandlers";
 export * from "./mappings/collectionHandlers";

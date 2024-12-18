@@ -7,20 +7,15 @@ import {
 import * as dotenv from "dotenv";
 import path from "path";
 
-const mode = process.env.NODE_ENV || "production";
-
 // Load the appropriate .env file
-const dotenvPath = path.resolve(
-  process.cwd(),
-  `.env${mode !== "production" ? `.${mode}` : ""}`
-);
+const dotenvPath = path.resolve(process.cwd(), ".env");
 dotenv.config({ path: dotenvPath });
 
 // Can expand the Datasource processor types via the generic param
 const project: EthereumProject = {
   specVersion: "1.0.0",
   version: "0.0.1",
-  name: "bsc-mobox-rewards",
+  name: "my-sq-testnet",
   description:
     "This project can be use as a starting point for developing your new BSC Testnet SubQuery project",
   runner: {
@@ -66,10 +61,19 @@ const project: EthereumProject = {
         handlers: [
           {
             kind: EthereumHandlerKind.Event,
-            handler: "handleCollectionCreated",
+            handler: `handleCollectionCreated${process.env.CHAIN_NAME}`,
             filter: {
               topics: [
                 "CollectionCreated(address owner, address collection, uint8 kind)",
+              ],
+            },
+          },
+          {
+            kind: EthereumHandlerKind.Event,
+            handler: `handleERC6551AccountCreated${process.env.CHAIN_NAME}`,
+            filter: {
+              topics: [
+                "ERC6551AccountCreated(address account, address indexed implementation, bytes32 salt, uint256 chainId, address indexed tokenContract, uint256 indexed tokenId)",
               ],
             },
           },
@@ -92,7 +96,7 @@ const project: EthereumProject = {
         handlers: [
           {
             kind: EthereumHandlerKind.Event,
-            handler: "handleTransfer",
+            handler: `handleTransfer${process.env.CHAIN_NAME}`,
             filter: {
               topics: ["Transfer(address from, address to, uint256 tokenId)"],
             },

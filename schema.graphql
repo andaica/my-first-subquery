@@ -4,22 +4,36 @@
 
 type Collection @entity {
   id: ID!
-  chainId: Int!
+  chainId: Int! @index
   blockHeight: BigInt
+  timestamp: BigInt
   address: String
-  owner: String
+  owner: String! @index
   kind: Int
 }
 
 type NFT @entity {
   id: ID!
-  chainId: Int!
+  chainId: Int! @index
   blockHeight: BigInt
-  collection: String!
+  timestamp: BigInt
+  collection: String! @index
   tokenId: BigInt!
-  owner: String
+  tokenUri: String
+  owner: String!  @index
   isBurned: Boolean
   isDerived: Boolean
   underlyingNFT: NFT
-  derivedKeys: [String]
+  tbaAccounts: [ERC6551Account] @derivedFrom(field: "underlyingNFT")
+}
+
+type ERC6551Account @entity {
+  id: ID!
+  chainId: Int! @index
+  blockHeight: BigInt
+  timestamp: BigInt
+  account: String!
+  implementation: String!
+  salt: String!
+  underlyingNFT: NFT!
 }
